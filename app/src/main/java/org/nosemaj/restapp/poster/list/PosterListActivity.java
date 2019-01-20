@@ -9,9 +9,12 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
 
-import org.nosemaj.restapp.PosterApplication;
 import org.nosemaj.restapp.R;
+import org.nosemaj.restapp.application.PosterApplication;
+import org.nosemaj.restapp.poster.single.PosterView;
 
 import javax.inject.Inject;
 
@@ -19,10 +22,10 @@ import javax.inject.Inject;
  * A simple activity which will display a list of video posters. The user may *
  * click on a poster to begin playback.
  */
-public final class PosterListActivity extends AppCompatActivity {
+public final class PosterListActivity extends AppCompatActivity
+        implements PosterListContract.View {
 
-    @Inject PosterListAdapter posterListAdapter;
-    @Inject LinearLayoutManager linearLayoutManager;
+    @Inject PosterListContract.Interactor interactor;
     private RecyclerView posterListView;
 
     @Override
@@ -34,13 +37,21 @@ public final class PosterListActivity extends AppCompatActivity {
             .getApplicationComponent()
             .inject(this);
 
-        // Bind posters list view to adapter
-        posterListView = (RecyclerView) findViewById(R.id.poster_list_view);
-        posterListView.setLayoutManager(linearLayoutManager);
-        posterListView.setAdapter(posterListAdapter);
+        final PosterListContract.Presenter presenter =
+            new PosterListPresenter(this, interactor, this);
 
-        // Update the posters, if needed
-        posterListAdapter.updatePosters();
+        // Setup the view
+        posterListView = (RecyclerView) findViewById(R.id.poster_list_view);
+        posterListView.setLayoutManager(new LinearLayoutManager(this));
+        posterListView.setAdapter(new PosterListAdapter(presenter));
+
+        // Call presenter to update the posters
+        presenter.refreshPosters();
+    }
+
+    @Override
+    public void invalidateView() {
+        runOnUiThread(() -> posterListView.getAdapter().notifyDataSetChanged());
     }
 
     @Override
@@ -48,6 +59,38 @@ public final class PosterListActivity extends AppCompatActivity {
         super.onDestroy();
         posterListView.setLayoutManager(null);
         posterListView.setAdapter(null);
+    }
+
+    /**
+     * PosterListAdapter is a view adapter; part of the implementation
+     * of a PosterListContract.View. Broken out as a subclass for
+     * maintainability.
+     */
+    static final class PosterListAdapter extends RecyclerView.Adapter<PosterView> {
+        private final PosterListContract.Presenter presenter;
+
+        /**
+         * Constructs a PosterListAdapter.
+         * @param presenter A poster list presenter
+         */
+        PosterListAdapter(final PosterListContract.Presenter presenter) {
+            this.presenter = presenter;
+        }
+
+        @Override
+        public PosterView onCreateViewHolder(final ViewGroup parent, final int viewType) {
+            return new PosterView(LayoutInflater.from(parent.getContext()), parent);
+        }
+
+        @Override
+        public void onBindViewHolder(PosterView posterView, int position) {
+            presenter.showPosterAtPosition(posterView, position);
+        }
+
+        @Override
+        public int getItemCount() {
+            return presenter.getListLength();
+        }
     }
 }
 

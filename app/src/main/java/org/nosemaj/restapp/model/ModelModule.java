@@ -2,15 +2,7 @@
  * Copyright (c) nosemaj.org, 2019.
  */
 
-package org.nosemaj.restapp.dagger;
-
-import org.nosemaj.restapp.model.ApiClient;
-import org.nosemaj.restapp.model.CachingPostersProvider;
-import org.nosemaj.restapp.model.NosemajApiClient;
-import org.nosemaj.restapp.model.PostersProvider;
-
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+package org.nosemaj.restapp.model;
 
 import javax.inject.Singleton;
 
@@ -51,16 +43,6 @@ public final class ModelModule {
     @Provides
     public static PostersProvider providePostersProvider(final ApiClient apiClient) {
         return new CachingPostersProvider(apiClient);
-    }
-
-    /**
-     * Provides a background executor.
-     * @return An executor
-     */
-    @Singleton
-    @Provides
-    public static Executor provideExecutor() {
-        return Executors.newSingleThreadExecutor();
     }
 }
 

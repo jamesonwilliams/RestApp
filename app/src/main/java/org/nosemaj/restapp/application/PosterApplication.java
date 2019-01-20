@@ -2,12 +2,9 @@
  * Copyright (c) nosemaj.org, 2019.
  */
 
-package org.nosemaj.restapp;
+package org.nosemaj.restapp.application;
 
 import android.app.Application;
-
-import org.nosemaj.restapp.dagger.ApplicationComponent;
-import org.nosemaj.restapp.dagger.DaggerApplicationComponent;
 
 /**
  * Application class for posters application.

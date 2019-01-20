@@ -6,6 +6,7 @@ package org.nosemaj.restapp.poster.single;
 
 import org.nosemaj.restapp.util.RandomString;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.mockito.Mockito.doReturn;

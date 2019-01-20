@@ -13,7 +13,7 @@ import java.util.List;
  * REST calls. Synchronous, blocking implementation that must *NOT* be
  * used on main thread.
  */
-public final class CachingPostersProvider implements PostersProvider {
+final class CachingPostersProvider implements PostersProvider {
 
     private final ApiClient apiClient;
     private final List<Poster> availablePosters;
@@ -22,7 +22,7 @@ public final class CachingPostersProvider implements PostersProvider {
      * Constructs a CachingPostersProvider.
      * @param apiClient An API client
      */
-    public CachingPostersProvider(final ApiClient apiClient) {
+    CachingPostersProvider(final ApiClient apiClient) {
         this.apiClient = apiClient;
         this.availablePosters = new ArrayList<>();
     }

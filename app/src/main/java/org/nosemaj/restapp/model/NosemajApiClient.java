@@ -21,7 +21,7 @@ import okhttp3.Response;
  * file. Raw OkHttpClient and "cherry-picking" of org.json data, without
  * explicit API modeling.
  */
-public final class NosemajApiClient implements ApiClient {
+final class NosemajApiClient implements ApiClient {
 
     private static final int SUCCESS = 200;
     private static final String POSTERS_URL = "https://nosemaj.org/dl/posters.json";
@@ -32,7 +32,7 @@ public final class NosemajApiClient implements ApiClient {
      * Constructs a new NosemajApiClient.
      * @param okHttpClient OkHttpClient
      */
-    public NosemajApiClient(final OkHttpClient okHttpClient) {
+    NosemajApiClient(final OkHttpClient okHttpClient) {
         this.okHttpClient = okHttpClient;
     }
 

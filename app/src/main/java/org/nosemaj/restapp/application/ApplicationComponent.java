@@ -2,11 +2,13 @@
  * Copyright (c) nosemaj.org, 2019.
  */
 
-package org.nosemaj.restapp.dagger;
+package org.nosemaj.restapp.application;
 
 import android.app.Application;
 
+import org.nosemaj.restapp.model.ModelModule;
 import org.nosemaj.restapp.poster.list.PosterListActivity;
+import org.nosemaj.restapp.poster.list.PosterListModule;
 
 import javax.inject.Singleton;
 

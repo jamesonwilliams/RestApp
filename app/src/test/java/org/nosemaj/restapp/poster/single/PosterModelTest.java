@@ -30,7 +30,7 @@ public final class PosterModelTest {
         final String movieName = RandomString.string();
         final String imageUrl = RandomString.string();
         final PosterModel model = PosterModel.create(movieName, imageUrl);
-        assertEquals(movieName, movie.getMovieName());
-        assertEquals(imageUrl, movie.getPosterArtUrl());
+        assertEquals(movieName, model.getMovieName());
+        assertEquals(imageUrl, model.getPosterArtUrl());
     }
 }
