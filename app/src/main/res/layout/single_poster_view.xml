@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- A view showing a movie poster image, overlayed with the movie name -->
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="200dp">
+
+    <!-- The poster art, displayed as a "background" of the poster -->
+    <ImageView
+        android:id="@+id/poster_art_view"
+        android:contentDescription="@string/empty"
+        android:src="@drawable/empty_poster"
+        android:scaleType="fitCenter"
+        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"/>
+   
+    <!-- The name of the movie, in the bottom right of the view -->
+       <TextView
+        android:id="@+id/movie_title_view"
+        android:text="@string/empty"
+        android:textSize="32sp"
+        android:padding="5dp"
+        android:background="#88000000"
+        android:textColor="@android:color/white"
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:gravity="end"
+        android:layout_gravity="bottom|end"/>
+
+</FrameLayout>
+
