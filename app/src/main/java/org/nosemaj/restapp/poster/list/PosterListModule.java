@@ -8,11 +8,9 @@ import android.content.Context;
 
 import org.nosemaj.restapp.model.PostersProvider;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
 import javax.inject.Singleton;
 
+import dagger.Lazy;
 import dagger.Module;
 import dagger.Provides;
 
@@ -31,18 +29,8 @@ public final class PosterListModule {
     @Provides
     @Singleton
     public static PosterListContract.Interactor providePosterListInteractor(
-            final Executor executor, final PostersProvider postersProvider) {
-        return new PosterListInteractor(executor, postersProvider);
-    }
-
-    /**
-     * Provides a background executor.
-     * @return An executor
-     */
-    @Singleton
-    @Provides
-    public static Executor provideExecutor() {
-        return Executors.newSingleThreadExecutor();
+            final Lazy<PostersProvider> postersProvider) {
+        return new PosterListInteractor(postersProvider);
     }
 }
 

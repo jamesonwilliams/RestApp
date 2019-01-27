@@ -6,8 +6,6 @@ package org.nosemaj.restapp.poster.list;
 
 import android.content.Context;
 
-import org.nosemaj.restapp.model.OnPostersAvailableListener;
-import org.nosemaj.restapp.model.OnPostersNotAvailableListener;
 import org.nosemaj.restapp.model.Poster;
 import org.nosemaj.restapp.poster.single.PosterContract;
 import org.nosemaj.restapp.poster.single.PosterInteractor;
@@ -17,16 +15,22 @@ import org.nosemaj.restapp.poster.single.PosterPresenter;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 /**
  * Presenter for poster list.
  */
-public final class PosterListPresenter implements PosterListContract.Presenter,
-        OnPostersAvailableListener, OnPostersNotAvailableListener {
+public final class PosterListPresenter implements PosterListContract.Presenter {
 
     private final PosterListContract.View view;
     private final PosterListContract.Interactor interactor;
     private final Context context;
     private final List<PosterContract.Model> posterViewModels;
+
+    private Disposable disposable;
 
     /**
      * Constructs a poster list presenter.
@@ -42,54 +46,41 @@ public final class PosterListPresenter implements PosterListContract.Presenter,
         this.interactor = interactor;
         this.context = context;
         this.posterViewModels = new ArrayList<>();
+        this.disposable = null;
     }
 
     @Override
-    public void showPosterAtPosition(final PosterContract.View view, final int position) {
+    public void posterBecomingVisible(final PosterContract.View view, final int position) {
         // Create child VIPER module and call *its* presenter.
-        PosterContract.Model model;
-        synchronized (posterViewModels) {
-            model = posterViewModels.get(position);
-        }
+        PosterContract.Model model = posterViewModels.get(position);
         final PosterContract.Interactor interactor = new PosterInteractor(context, model);
         final PosterContract.Presenter presenter = new PosterPresenter(view, interactor);
         view.setOnPosterClickedListener(() -> presenter.posterClicked());
         presenter.displayPoster();
     }
 
-    /**
-     * Displays the poster list.
-     */
     @Override
-    public void refreshPosters() {
-        // Callbacks occur on a different thread
-        interactor.getPosters(this::onPostersAvailable, this::onPostersNotAvailable);
+    public void viewCreated() {
+        disposable = interactor.observePosters()
+            .subscribeOn(Schedulers.io())
+            .map(poster -> PosterModel.create(poster.getMovieName(), poster.getPosterImageUrl()))
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(viewModel -> {
+                posterViewModels.add(viewModel);
+                view.posterInsertedAt(0);
+            }, error -> {
+                view.clearAllPosters();
+            });
     }
 
     @Override
-    public int getListLength() {
-        synchronized (posterViewModels) {
-            return posterViewModels.size();
-        }
+    public void viewDestroyed() {
+        disposable.dispose();
     }
 
     @Override
-    public void onPostersAvailable(final List<Poster> posters) {
-        synchronized (posterViewModels) {
-            posterViewModels.clear();
-            for (final Poster poster : posters) {
-                posterViewModels.add(PosterModel.create(poster.getMovieName(), poster.getPosterImageUrl()));
-            }
-        }
-        view.invalidateView();
-    }
-
-    @Override
-    public void onPostersNotAvailable(final Throwable error) {
-        synchronized (posterViewModels) {
-            posterViewModels.clear();
-        }
-        view.invalidateView();
+    public int getPosterCount() {
+        return posterViewModels.size();
     }
 }
 

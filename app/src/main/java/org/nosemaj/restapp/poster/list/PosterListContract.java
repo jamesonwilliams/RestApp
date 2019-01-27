@@ -9,7 +9,7 @@ import org.nosemaj.restapp.model.OnPostersNotAvailableListener;
 import org.nosemaj.restapp.model.Poster;
 import org.nosemaj.restapp.poster.single.PosterContract;
 
-import java.util.List;
+import io.reactivex.Observable;
 
 /**
  * Contract for components of a poster list.
@@ -22,10 +22,16 @@ public interface PosterListContract {
     interface View {
 
         /**
-         * Called to notify the view it is no longer displaying
-         * an up-to-date poster list.
+         * Clear all posters in the list.
          */
-        void invalidateView();
+        void clearAllPosters();
+
+        /**
+         * A poster has been created, and needs to be inserted into the
+         * list.
+         * @param position Position in list at which to insert
+         */
+        void posterInsertedAt(int position);
     }
 
     /**
@@ -34,23 +40,28 @@ public interface PosterListContract {
     interface Presenter {
 
         /**
-         * Present new posters into the view, if needed.
+         * A view has been created.
          */
-        void refreshPosters();
+        void viewCreated();
 
         /**
-         * Present a single poster view into a position of the list view.
-         * @param poster A single poster view
-         * @param position The position at which it should be shown, in
-         *                 the visible list
+         * A view has been destroyed.
          */
-        void showPosterAtPosition(PosterContract.View poster, int position);
+        void viewDestroyed();
 
         /**
-         * Gets the number of items in the poster list.
-         * @return length of poster list
+         * Gets the current count of posters that should be presented.
+         * @return number of posters to present
          */
-        int getListLength();
+        int getPosterCount();
+
+        /**
+         * Notifies the presenter that a particular poster within the
+         * list is entering the window.
+         * @param posterView A single poster
+         * @param position Position in the list
+         */
+        void posterBecomingVisible(final PosterContract.View posterView, int position);
     }
 
     /**
@@ -59,13 +70,10 @@ public interface PosterListContract {
     interface Interactor {
 
         /**
-         * Get a list of posters to show.
-         * @param onAvailable Callback when posters are available
-         * @param onError Callback when posters are not available
+         * Watch the data model for new posters.
+         * @return An observable stream of posters
          */
-        void getPosters(
-            OnPostersAvailableListener onAvailable,
-            OnPostersNotAvailableListener onError);
+        Observable<Poster> observePosters();
     }
     
     // Model = Poster

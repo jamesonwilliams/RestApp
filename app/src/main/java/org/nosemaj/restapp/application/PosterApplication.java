@@ -16,6 +16,7 @@ public final class PosterApplication extends Application {
 
     @Override
     public void onCreate() {
+        Trace.it();
         super.onCreate();
         applicationComponent = DaggerApplicationComponent.builder()
             .application(this)

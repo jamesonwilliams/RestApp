@@ -6,13 +6,14 @@ package org.nosemaj.restapp.poster.list;
 
 import android.content.Context;
 
-import org.nosemaj.restapp.model.OnPostersAvailableListener;
-import org.nosemaj.restapp.model.OnPostersNotAvailableListener;
 import org.nosemaj.restapp.model.Poster;
 import org.nosemaj.restapp.model.PostersProvider;
 
 import java.util.List;
-import java.util.concurrent.Executor;
+
+import dagger.Lazy;
+
+import io.reactivex.Observable;
 
 /**
  * A Poster list interactor.
@@ -21,29 +22,23 @@ final class PosterListInteractor implements PosterListContract.Interactor {
 
     private final int DEFAULT_POSTER_COUNT = 8;
 
-    private final Executor backgroundExecutor;
-    private final PostersProvider postersProvider;
+    private final Lazy<PostersProvider> postersProvider;
 
     /**
      * Constructs a poster list interactor.
-     * @param backgroundExecutor A background executor
      */
-    PosterListInteractor(
-            final Executor backgroundExecutor, final PostersProvider postersProvider) {
-        this.backgroundExecutor = backgroundExecutor;
+    PosterListInteractor(final Lazy<PostersProvider> postersProvider) {
         this.postersProvider = postersProvider;
     }
 
     @Override
-    public void getPosters(
-            final OnPostersAvailableListener onAvailable,
-            final OnPostersNotAvailableListener onError) {
-
-        backgroundExecutor.execute(() -> {
-            postersProvider.getPosters(
+    public Observable<Poster> observePosters() {
+        return Observable.create(emitter -> {
+            postersProvider.get().getPosters(
                 DEFAULT_POSTER_COUNT,
-                posters -> onAvailable.onPostersAvailable(posters),
-                error -> onError.onPostersNotAvailable(error)
+                posters -> Observable.fromIterable(posters)
+                    .forEach(poster -> emitter.onNext(poster)),
+                error -> emitter.onError(error)
             );
         });
     }

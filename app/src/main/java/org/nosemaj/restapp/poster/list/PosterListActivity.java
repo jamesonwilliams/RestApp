@@ -5,6 +5,7 @@
 package org.nosemaj.restapp.poster.list;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,39 +27,56 @@ public final class PosterListActivity extends AppCompatActivity
         implements PosterListContract.View {
 
     @Inject PosterListContract.Interactor interactor;
+    PosterListContract.Presenter presenter;
     private RecyclerView posterListView;
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         ((PosterApplication) getApplication())
             .getApplicationComponent()
             .inject(this);
 
-        final PosterListContract.Presenter presenter =
-            new PosterListPresenter(this, interactor, this);
+        presenter = new PosterListPresenter(this, interactor, this);
+        presenter.viewCreated();
 
         // Setup the view
-        posterListView = (RecyclerView) findViewById(R.id.poster_list_view);
-        posterListView.setLayoutManager(new LinearLayoutManager(this));
-        posterListView.setAdapter(new PosterListAdapter(presenter));
+        setContentView(R.layout.activity_main);
 
-        // Call presenter to update the posters
-        presenter.refreshPosters();
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        Parcelable layoutState = null;
+        if (savedInstanceState != null) layoutState = savedInstanceState.getParcelable("LLM");
+        if (layoutState != null) layoutManager.onRestoreInstanceState(layoutState);
+
+        posterListView = (RecyclerView) findViewById(R.id.poster_list_view);
+        posterListView.setLayoutManager(layoutManager);
+        posterListView.setAdapter(new PosterListAdapter());
     }
 
     @Override
-    public void invalidateView() {
-        runOnUiThread(() -> posterListView.getAdapter().notifyDataSetChanged());
+    public void onSaveInstanceState(final Bundle savedInstanceState) {
+        savedInstanceState.putParcelable("LLM", posterListView.getLayoutManager().onSaveInstanceState());
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
+        presenter.viewDestroyed();
+        presenter = null;
         posterListView.setLayoutManager(null);
         posterListView.setAdapter(null);
+        posterListView = null;
+        super.onDestroy();
+    }
+
+    @Override
+    public void posterInsertedAt(int position) {
+        posterListView.getAdapter().notifyItemInserted(position);
+    }
+
+    @Override
+    public void clearAllPosters() {
+        posterListView.getAdapter().notifyDataSetChanged();
     }
 
     /**
@@ -66,17 +84,7 @@ public final class PosterListActivity extends AppCompatActivity
      * of a PosterListContract.View. Broken out as a subclass for
      * maintainability.
      */
-    static final class PosterListAdapter extends RecyclerView.Adapter<PosterView> {
-        private final PosterListContract.Presenter presenter;
-
-        /**
-         * Constructs a PosterListAdapter.
-         * @param presenter A poster list presenter
-         */
-        PosterListAdapter(final PosterListContract.Presenter presenter) {
-            this.presenter = presenter;
-        }
-
+    final class PosterListAdapter extends RecyclerView.Adapter<PosterView> {
         @Override
         public PosterView onCreateViewHolder(final ViewGroup parent, final int viewType) {
             return new PosterView(LayoutInflater.from(parent.getContext()), parent);
@@ -84,12 +92,12 @@ public final class PosterListActivity extends AppCompatActivity
 
         @Override
         public void onBindViewHolder(PosterView posterView, int position) {
-            presenter.showPosterAtPosition(posterView, position);
+            presenter.posterBecomingVisible(posterView, position);
         }
 
         @Override
         public int getItemCount() {
-            return presenter.getListLength();
+            return presenter.getPosterCount();
         }
     }
 }
