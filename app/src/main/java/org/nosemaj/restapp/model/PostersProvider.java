@@ -22,5 +22,31 @@ public interface PostersProvider {
             int howMany,
             OnPostersAvailableListener onAvailable,
             OnPostersNotAvailableListener onNotAvailable);
+
+    /**
+     * Called when posters are not available, because of an error.
+     */
+    @FunctionalInterface
+    public interface OnPostersNotAvailableListener {
+
+        /**
+         * Posters are not available.
+         * @param error What went wrong
+         */
+        void onPostersNotAvailable(final Throwable error);
+    }
+
+    /**
+     * Called when posters are available.
+     */
+    @FunctionalInterface
+    public interface OnPostersAvailableListener {
+
+        /**
+         * Posters are available.
+         * @param posters Available movie posters
+         */
+        void onPostersAvailable(final List<Poster> posters);
+    }
 }
 

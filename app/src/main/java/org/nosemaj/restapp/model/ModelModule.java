@@ -17,6 +17,10 @@ import okhttp3.OkHttpClient;
 @Module
 public final class ModelModule {
 
+    /**
+     * Provides an OkHttpClient.
+     * @return OkHttpClient
+     */
     @Singleton
     @Provides
     public static OkHttpClient provideOkHttpClient() {
