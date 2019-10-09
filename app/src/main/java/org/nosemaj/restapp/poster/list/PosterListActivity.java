@@ -45,18 +45,10 @@ public final class PosterListActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        Parcelable layoutState = null;
-        if (savedInstanceState != null) layoutState = savedInstanceState.getParcelable("LLM");
-        if (layoutState != null) layoutManager.onRestoreInstanceState(layoutState);
 
         posterListView = (RecyclerView) findViewById(R.id.poster_list_view);
         posterListView.setLayoutManager(layoutManager);
         posterListView.setAdapter(new PosterListAdapter());
-    }
-
-    @Override
-    public void onSaveInstanceState(final Bundle savedInstanceState) {
-        savedInstanceState.putParcelable("LLM", posterListView.getLayoutManager().onSaveInstanceState());
     }
 
     @Override

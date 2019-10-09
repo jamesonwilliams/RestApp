@@ -6,8 +6,6 @@ package org.nosemaj.restapp.poster.list;
 
 import android.content.Context;
 
-import org.nosemaj.restapp.model.OnPostersAvailableListener;
-import org.nosemaj.restapp.model.OnPostersNotAvailableListener;
 import org.nosemaj.restapp.model.Poster;
 import org.nosemaj.restapp.poster.single.PosterContract;
 import org.nosemaj.restapp.util.RandomString;

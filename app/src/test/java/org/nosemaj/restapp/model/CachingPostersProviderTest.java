@@ -39,8 +39,8 @@ public final class CachingPostersProviderTest {
     );
 
     private ApiClient apiClient;
-    private OnPostersAvailableListener onAvailable;
-    private OnPostersNotAvailableListener onError;
+    private PostersProvider.OnPostersAvailableListener onAvailable;
+    private PostersProvider.OnPostersNotAvailableListener onError;
 
     private PostersProvider postersProvider;
 
@@ -49,8 +49,8 @@ public final class CachingPostersProviderTest {
         apiClient = mock(ApiClient.class);
         postersProvider = new CachingPostersProvider(apiClient);
 
-        onAvailable = mock(OnPostersAvailableListener.class);
-        onError = mock(OnPostersNotAvailableListener.class);
+        onAvailable = mock(PostersProvider.OnPostersAvailableListener.class);
+        onError = mock(PostersProvider.OnPostersNotAvailableListener.class);
     }
 
     @SuppressWarnings("unchecked") // List.class

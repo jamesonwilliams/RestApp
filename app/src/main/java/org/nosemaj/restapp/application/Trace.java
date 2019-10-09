@@ -5,6 +5,7 @@
 package org.nosemaj.restapp.application;
 
 import android.os.Debug;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -12,10 +13,10 @@ import android.os.Looper;
  * Utility for tracing method invocations.
  */
 public final class Trace {
-
-    private static final String LOG_FILE = "/sdcard/trace.log";
     private static final int BUFFER_SIZE = 300_000_000;
     private static final long RECORD_DURATION_MS = 20_000L /* ms */;
+    private static final String LOG_FILE =
+        Environment.getExternalStorageDirectory().getPath() + "/trace.log";
 
     /**
      * No instances.

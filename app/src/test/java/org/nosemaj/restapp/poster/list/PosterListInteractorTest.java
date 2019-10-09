@@ -6,8 +6,6 @@ package org.nosemaj.restapp.poster.list;
 
 import org.nosemaj.restapp.model.Poster;
 import org.nosemaj.restapp.model.PostersProvider;
-import org.nosemaj.restapp.model.OnPostersAvailableListener;
-import org.nosemaj.restapp.model.OnPostersNotAvailableListener;
 import org.nosemaj.restapp.util.RandomString;
 
 import java.util.Arrays;
@@ -56,8 +54,8 @@ public final class PosterListInteractorTest {
     public void getPosters_ReturnsPostersWhenAvailable() throws InterruptedException {
         // Mock posters providers, it just sends back the mock posters.
         doAnswer(invocation -> {
-            final OnPostersAvailableListener listener =
-                (OnPostersAvailableListener) (invocation.getArguments()[1]);
+            final PostersProvider.OnPostersAvailableListener listener =
+                (PostersProvider.OnPostersAvailableListener) (invocation.getArguments()[1]);
             listener.onPostersAvailable(EXPECTED_POSTERS);
             return null;
         })
@@ -94,8 +92,8 @@ public final class PosterListInteractorTest {
 
         // Arrange for posters provider to return an error callback
         doAnswer(invocation -> {
-            final OnPostersNotAvailableListener listener =
-                (OnPostersNotAvailableListener) (invocation.getArguments()[2]);
+            final PostersProvider.OnPostersNotAvailableListener listener =
+                (PostersProvider.OnPostersNotAvailableListener) (invocation.getArguments()[2]);
             listener.onPostersNotAvailable(EXPECTED_THROWABLE);
             return null;
         })
